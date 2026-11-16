@@ -1,0 +1,11 @@
+# Files of the server folder that are not part of this repository (see README.md)
+/public/carto-config.js
+/public/data/
+/public/assets/
+/public/social-preview.jpg
+/public.tar.gz
+/data/
+
+# Python
+__pycache__/
+*.py[cod]

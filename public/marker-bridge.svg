@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Friendship Bridge timing reference">
+  <circle cx="128" cy="128" r="108" fill="#f3f3f0" stroke="#1b2022" stroke-width="8"/>
+  <circle cx="128" cy="128" r="94" fill="none" stroke="#7e3531" stroke-width="7"/>
+  <g fill="none" stroke="#1b2022" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M56 105h144M67 105v64M189 105v64M52 169h152"/>
+    <path d="M72 105c14-42 98-42 112 0"/>
+    <path d="M91 105v-20M128 105V72M165 105V85" stroke="#7e3531" stroke-width="6"/>
+  </g>
+</svg>

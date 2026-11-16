@@ -1,0 +1,42 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    name: Server and repository (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Compile
+        run: python -m py_compile server.py
+      - name: Tests
+        run: python -m unittest discover --start-directory tests --verbose
+      - name: Container file
+        run: docker compose --file compose.yaml config --quiet
+
+  page:
+    name: Page (JavaScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Syntax of the modules
+        run: |
+          mkdir -p "$RUNNER_TEMP/modules"
+          for file in public/app.js public/*.mjs public/carto-config.example.js; do
+            name="$(basename "${file%.*}").mjs"
+            cp "$file" "$RUNNER_TEMP/modules/$name"
+            node --check "$RUNNER_TEMP/modules/$name"
+            echo "Checked $file"
+          done

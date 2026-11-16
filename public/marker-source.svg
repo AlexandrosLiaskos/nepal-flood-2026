@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Glacier-ice detachment source">
+  <circle cx="128" cy="128" r="108" fill="#f3f3f0" stroke="#1b2022" stroke-width="8"/>
+  <circle cx="128" cy="128" r="94" fill="none" stroke="#6f9fac" stroke-width="7"/>
+  <path d="M54 174 101 72l34 43 26-38 42 97Z" fill="#dfe9e8" stroke="#1b2022" stroke-width="7" stroke-linejoin="round"/>
+  <path d="m101 72 5 55 25 18-7 29M135 115l-10 24" fill="none" stroke="#6f9fac" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m173 103 22 12-10 24-22-12Z" fill="#f3f3f0" stroke="#1b2022" stroke-width="6" stroke-linejoin="round"/>
+  <path d="m177 145-8 16M195 144l-5 19" fill="none" stroke="#6f9fac" stroke-width="6" stroke-linecap="round"/>
+</svg>

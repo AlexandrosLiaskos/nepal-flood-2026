@@ -1,0 +1,647 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026 Nepal Debris Avalanche and Flash Flood | Interactive 2D and 3D Reconstruction</title>
+  <meta name="description" content="Interactive 2D and 3D terrain reconstruction of the 2026 Nepal debris avalanche and flash flood, its river-system pathway, event timing and documented impacts.">
+  <link rel="canonical" href="https://evelpidou.nkua.cloud/Nepal-Flood-2026/">
+  <link rel="icon" type="image/png" sizes="48x48" href="./favicon.png?v=20260828-3">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="National and Kapodistrian University of Athens">
+  <meta property="og:title" content="2026 Nepal Debris Avalanche and Flash Flood">
+  <meta property="og:description" content="Interactive 2D and 3D reconstruction of the event pathway, timing and documented impacts.">
+  <meta property="og:url" content="https://evelpidou.nkua.cloud/Nepal-Flood-2026/">
+  <meta property="og:image" content="https://evelpidou.nkua.cloud/Nepal-Flood-2026/social-preview.jpg?v=20260828-1">
+  <meta property="og:image:secure_url" content="https://evelpidou.nkua.cloud/Nepal-Flood-2026/social-preview.jpg?v=20260828-1">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="2200">
+  <meta property="og:image:height" content="1265">
+  <meta property="og:image:alt" content="Satellite context of the reconstructed 2026 Nepal debris-avalanche and flash-flood corridor">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="2026 Nepal Debris Avalanche and Flash Flood">
+  <meta name="twitter:description" content="Interactive 2D and 3D reconstruction of the event pathway, timing and documented impacts.">
+  <meta name="twitter:image" content="https://evelpidou.nkua.cloud/Nepal-Flood-2026/social-preview.jpg?v=20260828-1">
+  <meta name="twitter:image:alt" content="Satellite context of the reconstructed 2026 Nepal debris-avalanche and flash-flood corridor">
+  <script>
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) window.location.reload();
+    });
+  </script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <link rel="stylesheet" href="./styles.css?v=20260831-1">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/r185-20260828/three.module.min.js",
+        "three/addons/": "./vendor/examples-r185-20260828/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <main id="application">
+    <section id="terrain-panel" data-scene-mode="3d" aria-label="Interactive two-dimensional and three-dimensional valley reconstruction">
+      <canvas id="terrain-3d"></canvas>
+      <div id="terrain-2d" aria-label="Two-dimensional GIS map" hidden></div>
+      <button type="button" id="layers-button" aria-label="Open map layers" aria-controls="layers-drawer" aria-expanded="false" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
+      <div id="scene-mode-switch" role="group" aria-label="Scene view">
+        <button type="button" data-scene-mode="3d" aria-pressed="true" disabled>3D</button>
+        <button type="button" data-scene-mode="2d" aria-pressed="false" disabled>2D</button>
+      </div>
+      <div id="terrain-analysis-tools" role="group" aria-label="Terrain analysis tools">
+        <button type="button" data-terrain-tool="distance" data-label="Distance" aria-label="Measure distances between two terrain locations" aria-pressed="false" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 17 12-12 3 3L8 20z"></path><path d="m9 15 2 2M12 12l2 2M15 9l2 2"></path></svg>
+        </button>
+        <button type="button" data-terrain-tool="profile" data-label="Elevation profile" aria-label="Create an elevation profile between two terrain locations" aria-pressed="false" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4v16h16"></path><path d="m6 17 4-5 3 2 5-7"></path></svg>
+        </button>
+      </div>
+      <button type="button" id="guided-journey-launch" aria-label="Begin the guided flood-path journey" disabled hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 18c4-1 3-6 7-7 3-1 3-5 7-6"></path>
+          <path d="m14 4 6 3-6 3Z"></path>
+        </svg>
+        <span>Guided flood-path journey</span>
+      </button>
+      <section id="guided-journey-controls" aria-label="Guided flood-path journey controls" hidden>
+        <div class="guided-journey-copy">
+          <strong id="guided-journey-title">Guided flood-path journey</strong>
+          <span id="guided-journey-status" aria-live="polite">Preparing the source area…</span>
+        </div>
+        <div class="guided-journey-actions">
+          <label class="guided-journey-speed-control" for="guided-journey-speed">
+            <span>Speed</span>
+            <select id="guided-journey-speed" aria-label="Camera travel speed">
+              <option value="0.75">0.75×</option>
+              <option value="1">1×</option>
+              <option value="1.5" selected>1.5×</option>
+              <option value="2">2×</option>
+              <option value="3">3×</option>
+            </select>
+          </label>
+          <button type="button" id="guided-journey-layers" aria-label="Pause and open map layers">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m10 3 7 4-7 4-7-4 7-4Z"></path><path d="m3 11 7 4 7-4M3 15l7 4 7-4"></path></svg>
+            <span class="guided-journey-action-label">Layers</span>
+          </button>
+          <button type="button" id="guided-journey-pause" aria-label="Pause guided journey">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6.5 4.5v11M13.5 4.5v11"></path></svg>
+            <span class="guided-journey-action-label">Pause</span>
+          </button>
+          <button type="button" id="guided-journey-exit" aria-label="Exit guided journey">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4 4 16"></path></svg>
+            <span class="guided-journey-action-label">Exit</span>
+          </button>
+        </div>
+        <div id="guided-journey-progress" class="guided-journey-progress" role="slider" tabindex="0" aria-label="Journey position" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0.0 km">
+          <span id="guided-journey-progress-fill"></span>
+        </div>
+      </section>
+      <div id="layers-scrim" aria-hidden="true" hidden></div>
+      <aside id="layers-drawer" aria-labelledby="layers-title" aria-hidden="true">
+        <header class="layers-drawer-header">
+          <div>
+            <p class="layers-eyebrow">Terrain evidence</p>
+            <h2 id="layers-title">Map layers</h2>
+          </div>
+          <button type="button" id="layers-close" aria-label="Close map layers">
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+              <path d="M4 4l12 12M16 4L4 16"></path>
+            </svg>
+          </button>
+        </header>
+        <div class="layers-list">
+          <div id="basemap-control" class="basemap-control">
+            <label for="basemap-select">
+              <strong>Basemap</strong>
+              <small>Shown beneath scientific layers</small>
+            </label>
+            <select id="basemap-select">
+              <optgroup label="OpenFreeMap vector">
+                <option value="openfreemap-positron" selected>Positron</option>
+                <option value="openfreemap-liberty">Liberty</option>
+                <option value="openfreemap-bright">Bright</option>
+                <option value="openfreemap-fiord">Fiord</option>
+                <option value="openfreemap-dark">Dark</option>
+              </optgroup>
+              <optgroup label="CARTO">
+                <option value="carto-positron">Positron</option>
+                <option value="carto-voyager">Voyager</option>
+                <option value="carto-dark-matter">Dark Matter</option>
+              </optgroup>
+              <optgroup label="Community and scientific">
+                <option value="osm-standard">OpenStreetMap Standard</option>
+                <option value="opentopomap">OpenTopoMap</option>
+                <option value="nasa-blue-marble">NASA Blue Marble</option>
+              </optgroup>
+              <option value="none">No basemap</option>
+            </select>
+          </div>
+          <p class="layer-group-heading">Terrain and pathway</p>
+          <div class="layer-row layer-row-static layer-row-terrain" data-layer-row="terrain">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="terrain" checked>
+              <span class="layer-symbol layer-symbol-terrain" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path d="M4 23c4-1 5-5 9-5 4 0 5 4 9 4 3 0 4-2 6-3"></path><path d="M5 17c3-1 5-6 9-6 4 0 6 5 9 5 2 0 3-1 5-2"></path><path d="M7 11c3-1 4-5 8-5 3 0 5 4 8 4 2 0 3-1 4-1"></path></svg>
+              </span>
+              <span class="layer-label"><strong>DEM terrain</strong><small>HMA 8 m · Copernicus void fill</small></span>
+            </label>
+            <div class="vertical-exaggeration-control">
+              <label for="vertical-exaggeration">Vertical exaggeration</label>
+              <select id="vertical-exaggeration" aria-describedby="vertical-exaggeration-note">
+                <option value="0">0× · planar</option>
+                <option value="1">1× · true scale</option>
+                <option value="1.5">1.5×</option>
+                <option value="2" selected>2×</option>
+                <option value="2.5">2.5×</option>
+                <option value="3">3×</option>
+              </select>
+              <span id="vertical-exaggeration-note" class="visually-hidden">Changes rendered terrain relief without changing elevation values.</span>
+            </div>
+          </div>
+          <div class="layer-row layer-row-static" data-layer-row="detachment-zone">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="detachment-zone" checked>
+              <span class="layer-symbol layer-symbol-detachment" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path d="M6 11 12 5l9 2 5 7-2 9-8 4-8-5z"></path><path d="m10 12 5-3 6 3 1 6-5 5-6-3z"></path></svg>
+              </span>
+              <span class="layer-label"><strong>Detachment zone</strong><small>UNOSAT · Landsat 9 · 26 August 2026</small></span>
+            </label>
+          </div>
+          <div class="imagery-detail-control">
+            <label for="imagery-detail-mode">
+              <strong>Imagery detail</strong>
+              <small>Applies to high-resolution surface imagery</small>
+            </label>
+            <select id="imagery-detail-mode" aria-describedby="imagery-detail-note">
+              <option value="optimized" selected>Optimized</option>
+              <option value="native">Native detail</option>
+              <option value="source">Source pixels (2D)</option>
+            </select>
+            <span id="imagery-detail-note" class="visually-hidden">Native detail streams fixed georeferenced tiles. Source pixels streams the original Cloud Optimized GeoTIFF grid in the 2D scene.</span>
+          </div>
+          <div id="surface-layer-groups"></div>
+          <p class="layer-group-heading">Flood and mass-movement extents</p>
+          <div id="flood-extent-layer-groups"></div>
+          <div class="layer-row layer-row-static" data-layer-row="flow-path">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="flow-path" checked>
+              <span class="layer-symbol layer-symbol-route" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path class="route-symbol-casing" d="M7 28c8-4 2-10 10-13 8-3 2-8 9-11"></path><path class="route-symbol-core" d="M7 28c8-4 2-10 10-13 8-3 2-8 9-11"></path></svg>
+              </span>
+              <span class="layer-label"><strong>Reconstructed flow path</strong><small>Source to Chitwan–Devghat</small></span>
+            </label>
+          </div>
+          <p class="layer-group-heading">Event and impact records</p>
+          <div class="layer-row" data-layer-row="source">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="source" checked>
+              <span class="layer-symbol layer-symbol-image" aria-hidden="true"><img src="./marker-source.svg?v=20260828-2" alt=""></span>
+              <span class="layer-label"><strong>Glacier-ice source</strong><small><span data-layer-count="source">1</span> event marker</small></span>
+            </label>
+            <button type="button" class="layer-list-open" data-layer-list="source" aria-label="Open glacier-ice source marker list">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h9M5 12h9M5 17h9M17 8l4 4-4 4"></path></svg>
+            </button>
+          </div>
+          <div class="layer-row" data-layer-row="bridge-reference">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="bridge-reference" checked>
+              <span class="layer-symbol layer-symbol-image" aria-hidden="true"><img src="./marker-bridge.svg?v=20260828-2" alt=""></span>
+              <span class="layer-label"><strong>Friendship Bridge</strong><small><span data-layer-count="bridge-reference">1</span> timing marker</small></span>
+            </label>
+            <button type="button" class="layer-list-open" data-layer-list="bridge-reference" aria-label="Open Friendship Bridge marker list">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h9M5 12h9M5 17h9M17 8l4 4-4 4"></path></svg>
+            </button>
+          </div>
+          <div class="layer-row" data-layer-row="building">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="building" checked>
+              <span class="layer-symbol layer-symbol-impact" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path d="M5 15.5 16 6l11 9.5v11H5zM12 26v-7h8v7"></path><path class="layer-status-accent" d="M7 28h18"></path></svg>
+              </span>
+              <span class="layer-label"><strong>Buildings</strong><small><span data-layer-count="building">—</span> documented impacts</small></span>
+            </label>
+            <button type="button" class="layer-list-open" data-layer-list="building" aria-label="Open documented building impacts list">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h9M5 12h9M5 17h9M17 8l4 4-4 4"></path></svg>
+            </button>
+          </div>
+          <div class="layer-row" data-layer-row="bridge">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="bridge" checked>
+              <span class="layer-symbol layer-symbol-impact" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path d="M4 13h24M7 13v13M25 13v13M3 26h26M8 13c2-5 5-7 8-7s6 2 8 7"></path><path class="layer-status-accent" d="M5 29h22"></path></svg>
+              </span>
+              <span class="layer-label"><strong>Bridges</strong><small><span data-layer-count="bridge">—</span> documented impacts</small></span>
+            </label>
+            <button type="button" class="layer-list-open" data-layer-list="bridge" aria-label="Open documented bridge impacts list">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h9M5 12h9M5 17h9M17 8l4 4-4 4"></path></svg>
+            </button>
+          </div>
+          <div class="layer-row" data-layer-row="hydropower_facility">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="hydropower_facility" checked>
+              <span class="layer-symbol layer-symbol-impact" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path d="M5 26V10h22v16M9 10V6h14v4M3 26h26"></path><circle cx="16" cy="18" r="4"></circle><path d="M16 14v8M12 18h8" class="layer-symbol-fine"></path><path class="layer-status-accent" d="M5 29h22"></path></svg>
+              </span>
+              <span class="layer-label"><strong>Hydropower facilities</strong><small><span data-layer-count="hydropower_facility">—</span> documented impacts</small></span>
+            </label>
+            <button type="button" class="layer-list-open" data-layer-list="hydropower_facility" aria-label="Open documented hydropower-facility impacts list">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h9M5 12h9M5 17h9M17 8l4 4-4 4"></path></svg>
+            </button>
+          </div>
+          <div class="layer-row" data-layer-row="cultural_heritage">
+            <label class="layer-visibility-control">
+              <input type="checkbox" data-layer-toggle="cultural_heritage" checked>
+              <span class="layer-symbol layer-symbol-impact" aria-hidden="true">
+                <svg viewBox="0 0 32 32"><path d="m4 12 12-7 12 7M6 14h20M8 14v11M13 14v11M19 14v11M24 14v11M5 26h22M3 29h26"></path></svg>
+              </span>
+              <span class="layer-label"><strong>Cultural heritage</strong><small><span data-layer-count="cultural_heritage">—</span> documented impacts</small></span>
+            </label>
+            <button type="button" class="layer-list-open" data-layer-list="cultural_heritage" aria-label="Open documented cultural-heritage impacts list">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h9M5 12h9M5 17h9M17 8l4 4-4 4"></path></svg>
+            </button>
+          </div>
+        </div>
+      </aside>
+      <canvas id="orientation-3d" aria-label="Camera orientation: north, east and vertical elevation axes"></canvas>
+      <button type="button" id="full-view-button" aria-label="Open map in full view" aria-controls="terrain-panel" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5M15 4h5v5M20 15v5h-5M9 20H4v-5"></path></svg>
+      </button>
+      <button type="button" id="information-button" aria-label="Open project information" aria-haspopup="dialog" aria-controls="information-dialog">i</button>
+      <button type="button" id="help-button" aria-label="Open terrain viewer help" aria-haspopup="dialog" aria-controls="help-dialog">?</button>
+      <button type="button" id="full-view-exit" aria-label="Exit full map view" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5 5 19"></path></svg>
+      </button>
+      <div id="load-status" role="status" aria-live="polite">
+        <svg class="terrain-loader-mark" viewBox="0 0 96 56" aria-hidden="true">
+          <path class="terrain-loader-contour" d="M4 47c10-3 13-13 23-13 8 0 12 7 19 7 10 0 12-18 24-18 8 0 11 8 22 10"></path>
+          <path class="terrain-loader-contour" d="M9 36c8-4 10-13 19-13 8 0 11 7 18 7 9 0 12-19 23-19 8 0 12 9 20 10"></path>
+          <path class="terrain-loader-contour" d="M18 24c5-4 8-12 15-12 7 0 10 7 16 7 7 0 10-13 19-14 7 0 10 6 15 7"></path>
+          <path class="terrain-loader-trace" d="M4 47c10-3 13-13 23-13 8 0 12 7 19 7 10 0 12-18 24-18 8 0 11 8 22 10"></path>
+        </svg>
+        <span class="terrain-loader-copy"><strong>Preparing 3D terrain</strong><span>Loading elevation geometry…</span></span>
+      </div>
+      <div id="elevation-legend" aria-label="Terrain elevation colour scale in metres; geometry displayed with 2 times vertical exaggeration">
+        <div class="elevation-legend-heading"><span>Elevation</span><span class="elevation-legend-unit">(m)</span></div>
+        <div id="elevation-ramp" aria-hidden="true"></div>
+        <div class="elevation-legend-values"><span id="elevation-low">—</span><span id="elevation-mid">—</span><span id="elevation-high">—</span></div>
+      </div>
+      <div id="imagery-legend" aria-label="Active satellite imagery" hidden>
+        <strong id="imagery-legend-title">Satellite imagery</strong>
+        <span id="imagery-legend-detail">—</span>
+        <div id="imagery-legend-scale" hidden>
+          <div id="imagery-legend-ramp" aria-hidden="true"></div>
+          <div id="imagery-legend-values"></div>
+        </div>
+        <div id="imagery-legend-categories" hidden></div>
+        <span id="imagery-legend-note" hidden></span>
+        <a id="imagery-legend-source" href="#" target="_blank" rel="noopener noreferrer">Source</a>
+      </div>
+      <aside id="record-popover" role="dialog" aria-labelledby="record-popover-title" hidden>
+        <figure id="record-popover-media" hidden>
+          <a id="record-popover-media-link" href="https://www.reuters.com/graphics/NEPAL-FLOODS/MAP/byvrdywwlve/" target="_blank" rel="noopener noreferrer" aria-label="Open source in a new tab">
+            <img id="record-popover-media-image" alt="Terrain reconstruction of the glacier detachment and avalanche path" decoding="async">
+          </a>
+          <div id="record-popover-sensitive-media" class="sensitive-media sensitive-media-compact" hidden>
+            <video id="record-popover-media-video" controls muted playsinline preload="metadata" hidden></video>
+            <div id="record-popover-media-warning" class="sensitive-media-warning" role="note" hidden>
+              <p><strong>Content warning</strong><span>This footage shows people being overtaken and killed by the debris flood.</span></p>
+              <button type="button" id="record-popover-media-reveal">View footage</button>
+            </div>
+          </div>
+          <figcaption><a id="record-popover-media-source" href="https://www.reuters.com/graphics/NEPAL-FLOODS/MAP/byvrdywwlve/" target="_blank" rel="noopener noreferrer">Source</a></figcaption>
+        </figure>
+        <header class="record-popover-header">
+          <div>
+            <h2 id="record-popover-title">Selected record</h2>
+            <p id="record-popover-context"></p>
+          </div>
+          <button type="button" id="record-popover-close" aria-label="Close selected record">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"></path></svg>
+          </button>
+        </header>
+        <div class="record-popover-body">
+          <p id="record-popover-primary"></p>
+          <p id="record-popover-secondary"></p>
+          <button type="button" id="record-read-more" aria-haspopup="dialog" aria-controls="record-dialog">
+            <span>Read more</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5"></path></svg>
+          </button>
+        </div>
+      </aside>
+    </section>
+
+    <aside id="inspector" aria-live="polite">
+      <header id="panel-header" class="is-overview">
+        <div>
+          <h1 id="panel-title">2026 Nepal Debris Avalanche and Flash Flood</h1>
+          <div id="overview-authorship" class="overview-authorship" aria-label="Authors and affiliation">
+              <p class="overview-authors"><a class="author-mail-link" href="mailto:evelpidou@geol.uoa.gr">Niki Evelpidou</a><sup>1</sup>, <a class="author-mail-link" href="mailto:alexliaskos@geol.uoa.gr">Alexandros Liaskos</a><sup>1</sup>, <a class="author-mail-link" href="mailto:evspyrou@geol.uoa.gr">Evaggelos Spyrou</a><sup>1</sup>, and <a class="author-mail-link" href="mailto:niteshkhadka48@gmail.com">Nitesh Khadka</a><sup>2</sup></p>
+              <p class="overview-affiliation"><sup>1</sup> <a class="institution-link" href="https://en.uoa.gr/" target="_blank" rel="noopener noreferrer">National and Kapodistrian University of Athens</a></p>
+              <p class="overview-affiliation"><sup>2</sup> Centre for Water Resources Studies, Institute of Engineering, Tribhuvan University, Nepal</p>
+          </div>
+          <p id="panel-context"></p>
+        </div>
+        <button type="button" id="panel-exit" hidden>Clear selection</button>
+      </header>
+
+      <div id="panel-body">
+        <section id="overview-panel" aria-labelledby="panel-title">
+          <p class="overview-introduction">On 26 August 2026, a glacier-ice detachment near the Nepal–China border generated a debris avalanche and rapidly propagating flood along the Bhote Koshi–Trishuli river system. The downstream propagation pathway was delineated by integrating satellite-derived flow extents and geolocated damage observations from the United Nations Satellite Centre (UNOSAT) and the Copernicus Emergency Management Service (CEMS) with Humanitarian OpenStreetMap Team (HOT) mapping, and its longitudinal profile was reconstructed using the NASA High Mountain Asia and Copernicus digital elevation models.</p>
+          <div class="overview-map-composition">
+            <div id="overview-route-map" role="img" aria-label="CARTO Positron map of the reconstructed source-to-Devghat propagation pathway"></div>
+            <div id="overview-context-map" role="img" aria-label="Regional inset locating the area of interest within Nepal and surrounding countries"></div>
+          </div>
+          <div class="overview-actions">
+            <button type="button" id="information-read-more" class="overview-about-link" aria-haspopup="dialog" aria-controls="information-dialog">
+              <span>Read more about this project</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5"></path></svg>
+            </button>
+            <button type="button" id="overview-layers-button" class="overview-about-link" aria-controls="layers-drawer" disabled>
+              <span>View map layers</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m10 3 7 4-7 4-7-4 7-4Z"></path><path d="m3 11 7 4 7-4M3 15l7 4 7-4"></path></svg>
+            </button>
+          </div>
+        </section>
+
+        <section id="measurement-panel" aria-label="Along-path measurement" hidden>
+          <p id="measurement-instruction" role="status">Click the route to place endpoint A.</p>
+          <div class="measurement-steps" aria-label="Measurement endpoints">
+            <div class="measurement-step is-current" id="measurement-step-a">
+              <span class="endpoint-letter">A</span>
+              <span><strong>Start</strong><small id="measurement-a-detail">Not set</small></span>
+            </div>
+            <span class="measurement-connector" aria-hidden="true"></span>
+            <div class="measurement-step" id="measurement-step-b">
+              <span class="endpoint-letter">B</span>
+              <span><strong>End</strong><small id="measurement-b-detail">Not set</small></span>
+            </div>
+          </div>
+          <div id="measurement-results" hidden>
+            <dl class="measurement-summary">
+              <div><dt>Along-path distance</dt><dd id="measurement-distance">—</dd></div>
+              <div><dt>Elevation change, B − A</dt><dd id="measurement-elevation-change">—</dd></div>
+            </dl>
+            <h2>Longitudinal elevation profile</h2>
+            <svg id="longitudinal-profile" role="img" aria-label="Elevation profile between the two selected route locations"></svg>
+            <button type="button" id="new-measurement" class="primary-action">New measurement</button>
+          </div>
+        </section>
+
+        <section id="terrain-analysis-panel" aria-label="Terrain analysis" hidden>
+          <p id="terrain-analysis-instruction" role="status">Select location A on the terrain.</p>
+          <div class="measurement-steps" aria-label="Terrain-analysis endpoints">
+            <div class="measurement-step is-current" id="terrain-analysis-step-a">
+              <span class="endpoint-letter">A</span>
+              <span><strong>Start</strong><small id="terrain-analysis-a-detail">Not set</small></span>
+            </div>
+            <span class="measurement-connector" aria-hidden="true"></span>
+            <div class="measurement-step" id="terrain-analysis-step-b">
+              <span class="endpoint-letter">B</span>
+              <span><strong>End</strong><small id="terrain-analysis-b-detail">Not set</small></span>
+            </div>
+          </div>
+          <div id="terrain-analysis-results" hidden>
+            <dl class="inspection-table terrain-analysis-metrics">
+              <dt>Horizontal (planimetric)</dt><dd id="terrain-analysis-horizontal">—</dd>
+              <dt>Straight-line 3D</dt><dd id="terrain-analysis-straight">—</dd>
+              <dt>Terrain-surface</dt><dd id="terrain-analysis-surface">—</dd>
+              <dt>Elevation change, B − A</dt><dd id="terrain-analysis-elevation-change">—</dd>
+            </dl>
+            <p id="terrain-analysis-method-note" class="secondary">Terrain-surface distance is sampled along the straight A–B transect from the displayed 96 m DEM.</p>
+            <div id="terrain-analysis-profile-region" hidden>
+              <h2>Elevation profile</h2>
+              <svg id="terrain-analysis-profile" role="img" aria-label="Terrain elevation profile between locations A and B"></svg>
+            </div>
+            <button type="button" id="new-terrain-analysis" class="primary-action">Select new locations</button>
+          </div>
+        </section>
+
+        <section id="point-inspection" hidden>
+          <dl id="location-data" class="inspection-table">
+            <dt>Latitude</dt><dd id="latitude">—</dd>
+            <dt>Longitude</dt><dd id="longitude">—</dd>
+            <dt>Elevation</dt><dd id="elevation">—</dd>
+          </dl>
+          <button type="button" id="measure-from-point" class="primary-action">Measure from here</button>
+
+          <h2>Cross-valley terrain</h2>
+          <p class="secondary" id="cross-orientation">—</p>
+          <div class="profile-region">
+            <p id="cross-profile-status" role="status" hidden></p>
+            <svg id="cross-section" role="img" aria-label="Cross-valley elevation profile at the selected path location"></svg>
+          </div>
+        </section>
+      </div>
+    </aside>
+  </main>
+
+  <dialog id="record-dialog" aria-labelledby="record-dialog-title">
+    <header class="record-dialog-header">
+      <div>
+        <h2 id="record-dialog-title">Selected record</h2>
+        <p id="record-dialog-context"></p>
+      </div>
+      <button type="button" id="record-dialog-close" aria-label="Close full record">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16"></path></svg>
+      </button>
+    </header>
+    <div class="record-dialog-body">
+      <section id="feature-inspection" aria-label="Feature information" hidden>
+        <dl id="feature-data" class="inspection-table">
+          <dt>Name</dt><dd id="feature-name">—</dd>
+          <dt id="feature-utc-label">Recorded time (UTC)</dt><dd id="feature-utc">—</dd>
+          <dt>Nepal Time (NPT)</dt><dd id="feature-nepal-time">—</dd>
+          <dt>China Standard Time (CST)</dt><dd id="feature-china-time">—</dd>
+          <dt>Latitude</dt><dd id="feature-latitude">—</dd>
+          <dt>Longitude</dt><dd id="feature-longitude">—</dd>
+          <dt>Elevation</dt><dd id="feature-elevation">—</dd>
+        </dl>
+        <section id="feature-source-evidence" class="source-event-evidence" aria-labelledby="source-evidence-title" hidden>
+          <h3 id="source-evidence-title">Source-event reconstruction</h3>
+          <p>The lower part of a glacier near Langtang Lirung detached and fell hundreds of metres onto the valley floor. Satellite imagery shows a large section missing between 24 and 26 August 2026, followed by an ice-and-rock avalanche entering the Lhende Khola river system.</p>
+          <ul class="source-event-findings">
+                    <li>University of Calgary geomorphologist Dan Shugar rapidly located the collapse source using Planet Labs imagery and publicly identified the flood as originating from a collapsed glacier, supporting an ice–rock collapse interpretation rather than a glacial lake outburst flood. <a href="https://bsky.app/profile/watershedlab.bsky.social/post/3mty5haduvk2j" target="_blank" rel="noopener noreferrer">Source</a> · <a href="https://www.youtube.com/watch?v=qrUx1qYIW4U" target="_blank" rel="noopener noreferrer">Interview</a></li>
+            <li>The U.S. Geological Survey catalogues the 02:52:10 UTC seismic signal as an M5.2 landslide and states that the glacial collapse generated energy equivalent to an M5.2 earthquake; it was not a tectonic earthquake. <a href="https://www.usgs.gov/programs/landslide-hazards/science/2026-nepal-debris-avalanche-and-flash-flood" target="_blank" rel="noopener noreferrer">Source</a></li>
+            <li>The estimated debris-flow velocity was approximately 50 m s<sup>−1</sup>, with an affected runout exceeding 20 km.</li>
+          </ul>
+          <p class="source-event-link"><a href="https://www.reuters.com/graphics/NEPAL-FLOODS/MAP/byvrdywwlve/" target="_blank" rel="noopener noreferrer">Source</a></p>
+          <div class="source-event-figures">
+            <figure>
+              <a href="https://www.reuters.com/graphics/NEPAL-FLOODS/MAP/byvrdywwlve/" target="_blank" rel="noopener noreferrer">
+                <img data-source-image data-src="assets/reuters-glacier-collapse-overview.png?v=20260828-3" alt="Annotated terrain reconstruction showing glacier detachment, avalanche descent and downstream flood propagation" loading="lazy" decoding="async">
+              </a>
+              <figcaption><a href="https://www.reuters.com/graphics/NEPAL-FLOODS/MAP/byvrdywwlve/" target="_blank" rel="noopener noreferrer">Source</a></figcaption>
+            </figure>
+            <figure>
+              <a href="https://www.reuters.com/graphics/NEPAL-FLOODS/MAP/byvrdywwlve/" target="_blank" rel="noopener noreferrer">
+                <img data-source-image data-src="assets/reuters-glacier-before-after.png?v=20260828-2" alt="Annotated before-and-after satellite comparison of the glacier between 24 and 26 August 2026" loading="lazy" decoding="async">
+              </a>
+              <figcaption><a href="https://www.reuters.com/graphics/NEPAL-FLOODS/MAP/byvrdywwlve/" target="_blank" rel="noopener noreferrer">Source</a></figcaption>
+            </figure>
+          </div>
+        </section>
+        <section id="feature-bridge-evidence" class="source-event-evidence bridge-event-evidence" aria-labelledby="bridge-evidence-title" hidden>
+          <h3 id="bridge-evidence-title">Bridge observation</h3>
+          <figure class="bridge-event-video">
+            <div class="sensitive-media">
+              <video id="feature-bridge-video" data-src="assets/gyirong-port-cctv-silent.mp4?v=20260828-1" controls muted playsinline preload="metadata" aria-label="Security-camera footage of debris-flood arrival at the Friendship Bridge observation site"></video>
+              <div id="feature-bridge-warning" class="sensitive-media-warning" role="note">
+                <p><strong>Content warning</strong><span>This security-camera footage shows people being overtaken and killed by the debris flood. Viewer discretion is advised.</span></p>
+                <button type="button" id="feature-bridge-reveal">View footage</button>
+              </div>
+            </div>
+            <figcaption><a href="https://www.youtube.com/watch?v=y-zAdQWXgs4&amp;t=39600s" target="_blank" rel="noopener noreferrer">Original post</a> · <a href="https://www.reuters.com/graphics/NEPAL-FLOODS/MAP/byvrdywwlve/cdn/images/gyirongPort.mp4" target="_blank" rel="noopener noreferrer">Video source</a></figcaption>
+          </figure>
+          <p>China Central Television (CCTV) security-camera footage, originally posted by Annapurna, records the first observed arrival of the debris flood at the bridge at <a href="https://www.youtube.com/watch?v=y-zAdQWXgs4&amp;t=39600s" target="_blank" rel="noopener noreferrer">11:00:00 China Standard Time</a> on 26 August 2026, equivalent to 03:00:00 UTC and <a href="https://www.youtube.com/watch?v=y-zAdQWXgs4&amp;t=31500s" target="_blank" rel="noopener noreferrer">08:45:00 Nepal Time</a>.</p>
+          <p>From the 02:52:10 UTC seismic onset to the recorded arrival, the elapsed time is 7 min 50 s. Applying this interval to the reconstructed valley-path distance implies a potential path-averaged propagation speed of 49.6–50.8 m s<sup>−1</sup>. This is a kinematic estimate, not a direct measurement of instantaneous debris-flow velocity; debris volume, entrainment, rheology, channel geometry, temporary storage, and other controlling parameters are not constrained.</p>
+        </section>
+      </section>
+
+      <section id="damage-inspection" aria-label="Documented physical impact" hidden>
+        <dl id="damage-data" class="inspection-table">
+          <dt>Name</dt><dd id="damage-name">—</dd>
+          <dt>Assessment</dt><dd id="damage-assessment">—</dd>
+          <dt>Evidence</dt><dd id="damage-evidence">—</dd>
+          <div id="damage-location-data" class="inspection-table-rows">
+            <dt>Latitude</dt><dd id="damage-latitude">—</dd>
+            <dt>Longitude</dt><dd id="damage-longitude">—</dd>
+            <dt>Elevation</dt><dd id="damage-elevation">—</dd>
+          </div>
+        </dl>
+        <div class="damage-sources" aria-labelledby="damage-sources-heading">
+          <h2 id="damage-sources-heading">Sources</h2>
+          <ul id="damage-source-list"></ul>
+        </div>
+        <section id="damage-context-evidence" class="damage-context-evidence" aria-labelledby="damage-context-heading" hidden>
+          <h2 id="damage-context-heading">Site evidence</h2>
+          <p id="damage-context-scope"></p>
+          <figure id="damage-context-media" hidden>
+            <a id="damage-context-media-link" target="_blank" rel="noopener noreferrer">
+              <img id="damage-context-media-image" loading="lazy" decoding="async">
+            </a>
+            <figcaption><a id="damage-context-media-source" target="_blank" rel="noopener noreferrer">Source</a></figcaption>
+          </figure>
+          <ul id="damage-context-source-list"></ul>
+        </section>
+        <button type="button" id="zoom-to-damage-cluster" class="primary-action" hidden>Zoom further into group</button>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog id="help-dialog" aria-labelledby="help-title">
+    <header class="help-dialog-header">
+      <h2 id="help-title">Viewer controls</h2>
+      <button type="button" id="help-close" aria-label="Close help">
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M4 4l12 12M16 4L4 16"></path>
+        </svg>
+      </button>
+    </header>
+    <div class="help-dialog-body">
+      <dl class="help-shortcuts">
+        <dt><kbd>3D · Left drag</kbd></dt><dd>Orbit around the terrain.</dd>
+        <dt><kbd>2D · Drag</kbd></dt><dd>Pan the north-up GIS map.</dd>
+        <dt><kbd>Wheel</kbd></dt><dd>Zoom in or out.</dd>
+        <dt><kbd>3D · Right drag</kbd></dt><dd>Pan the terrain view.</dd>
+        <dt><kbd>3D / 2D</kbd></dt><dd>Change renderer without changing visible layers or the selected record.</dd>
+        <dt><kbd>Click route</kbd></dt><dd>Inspect coordinates, elevation and the cross-valley profile.</dd>
+        <dt><kbd>Click marker</kbd></dt><dd>Open a compact source or bridge record; select Read more for complete details.</dd>
+        <dt><kbd>Click impact</kbd></dt><dd>Open a compact assessed record or grouped-record summary; select Read more for complete details.</dd>
+        <dt><kbd>Layers</kbd></dt><dd>Show or hide marker categories and locate individual records from their layer lists.</dd>
+        <dt><kbd>Guided journey</kbd></dt><dd>Follow the reconstructed flood pathway through the 3D valley, with optional pauses at enabled evidence records.</dd>
+        <dt><kbd>Distance</kbd></dt><dd>Select any two DEM locations to compare horizontal, straight-line 3D, and terrain-surface distance.</dd>
+        <dt><kbd>Elevation profile</kbd></dt><dd>Select any two DEM locations to plot elevation along the straight A–B transect.</dd>
+        <dt><kbd>Impact colours</kbd></dt><dd>Muted violet rings mark destroyed assets, ochre rings mark damaged assets, and slate count badges group nearby records at the current scale.</dd>
+        <dt><kbd>Measure</kbd></dt><dd>Select two route locations to calculate along-path distance and elevation change.</dd>
+        <dt><kbd>N · E · Z</kbd></dt><dd>Camera-relative north, east and elevation orientation in 3D.</dd>
+      </dl>
+    </div>
+  </dialog>
+
+  <dialog id="information-dialog" aria-labelledby="information-title">
+    <header class="information-dialog-header">
+      <div>
+        <p class="information-eyebrow">Research information</p>
+        <h2 id="information-title">About this Project</h2>
+      </div>
+      <button type="button" id="information-close" aria-label="Close project information">
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M4 4l12 12M16 4L4 16"></path>
+        </svg>
+      </button>
+    </header>
+    <div class="information-dialog-body">
+      <section class="solidarity-statement" aria-labelledby="solidarity-title">
+        <h3 id="solidarity-title">With respect and solidarity</h3>
+        <p>We extend our deepest sympathy to the people and communities affected by the 26 August 2026 disaster, especially to those who lost family members and loved ones, sustained injuries, were displaced, or suffered the loss of homes, livelihoods, infrastructure, and cultural or natural heritage. We stand in solidarity with Nepal and with every community along the affected region.</p>
+        <p>This research is offered in the hope that it can strengthen scientific understanding, risk awareness, preparedness, and future efforts to prevent or mitigate such hazards and catastrophes.</p>
+      </section>
+
+      <section class="information-section" aria-labelledby="project-credits-title">
+        <h3 id="project-credits-title">Project and credits</h3>
+        <dl class="information-credits">
+          <dt>Research and application</dt>
+                <dd><a class="author-mail-link" href="mailto:evelpidou@geol.uoa.gr">Niki Evelpidou</a><sup>1</sup>, <a class="author-mail-link" href="mailto:alexliaskos@geol.uoa.gr">Alexandros Liaskos</a><sup>1</sup>, <a class="author-mail-link" href="mailto:evspyrou@geol.uoa.gr">Evaggelos Spyrou</a><sup>1</sup>, and <a class="author-mail-link" href="mailto:niteshkhadka48@gmail.com">Nitesh Khadka</a><sup>2</sup></dd>
+                <dt>Affiliations</dt>
+                <dd><sup>1</sup> Department of Geology and Geoenvironment, <a class="institution-link" href="https://en.uoa.gr/" target="_blank" rel="noopener noreferrer">National and Kapodistrian University of Athens</a><br><sup>2</sup> Centre for Water Resources Studies, Institute of Engineering, Tribhuvan University, Nepal</dd>
+                <dt>Contact</dt>
+                <dd class="credit-contact-list"><a href="mailto:evelpidou@geol.uoa.gr">evelpidou@geol.uoa.gr</a><a href="mailto:alexliaskos@geol.uoa.gr">alexliaskos@geol.uoa.gr</a><a href="mailto:evspyrou@geol.uoa.gr">evspyrou@geol.uoa.gr</a><a href="mailto:niteshkhadka48@gmail.com">niteshkhadka48@gmail.com</a></dd>
+          <dt>Terrain data</dt>
+          <dd>NASA High Mountain Asia DEM and Copernicus DEM</dd>
+          <dt>Event and impact evidence</dt>
+          <dd>USGS, GFZ, United Nations Satellite Centre (UNOSAT), Copernicus Emergency Management Service (CEMS), Humanitarian OpenStreetMap Team (HOT), Sentinel Asia, JAXA, Institute of Water Modelling (IWM), and Taiwan Space Agency (TASA)</dd>
+                <dt>Mapping and software</dt>
+                <dd>OpenStreetMap contributors, OpenFreeMap, CARTO, NASA GIBS, OpenTopoMap, Three.js, OpenLayers, and Leaflet</dd>
+              </dl>
+            </section>
+
+      <section class="information-section" aria-labelledby="citation-title">
+        <h3 id="citation-title">How to cite</h3>
+        <p id="citation-text" class="citation-text">Evelpidou, N., Liaskos, A., Spyrou, E., &amp; Khadka, N. (2026). <em>2026 Nepal Debris Avalanche and Flash Flood: Interactive 2D and 3D terrain reconstruction</em> [Web application]. National and Kapodistrian University of Athens. https://evelpidou.nkua.cloud/Nepal-Flood-2026/</p>
+        <button type="button" id="copy-citation">Copy citation</button>
+        <p>The accompanying <a href="https://evelpidou.nkua.cloud/Nepal-Flood-2026-Catalogue/" target="_blank" rel="noopener noreferrer">living data catalogue</a> brings together publicly available resources for further investigations of the disaster cascade. Its first dated release is archived on <a href="https://doi.org/10.5281/zenodo.23034746" target="_blank" rel="noopener noreferrer">Zenodo</a>.</p>
+      </section>
+
+      <section class="information-section" aria-labelledby="license-title">
+        <h3 id="license-title">Licence and reuse</h3>
+        <p>Except where third-party data, basemaps, imagery, logos, or source materials are separately credited, the original text, interface, visualisation design, and research outputs of this application are licensed under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener noreferrer">Creative Commons Attribution 4.0 International licence (CC BY 4.0)</a>.</p>
+        <p>You may share and adapt this material provided that you give appropriate credit, link to the licence, and indicate whether changes were made. Third-party materials remain subject to their respective terms and licences.</p>
+      </section>
+
+      <section class="information-section visit-section" aria-labelledby="visits-title">
+        <h3 id="visits-title">Page visits</h3>
+        <div class="visit-count" aria-live="polite">
+          <strong id="visit-count">—</strong>
+          <span>Recorded page visits</span>
+        </div>
+        <p class="visit-note">The counter does not use cookies or collect information that can identify individual visitors. Only the aggregate visit count is stored; the counter dataset contains no IP addresses or other identifying information.</p>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog id="layer-list-dialog" aria-labelledby="layer-list-title">
+    <header class="layer-dialog-header">
+      <div>
+        <p class="layers-eyebrow">Map layer</p>
+        <h2 id="layer-list-title">Layer records</h2>
+        <p id="layer-list-summary">—</p>
+      </div>
+      <button type="button" id="layer-list-close" aria-label="Close layer records">
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M4 4l12 12M16 4L4 16"></path>
+        </svg>
+      </button>
+    </header>
+    <div id="layer-feature-list" role="list"></div>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <script type="module" src="./app.js?v=20260831-7"></script>
+</body>
+</html>

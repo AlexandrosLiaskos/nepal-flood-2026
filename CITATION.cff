@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this web application, please cite it as below."
+title: "2026 Nepal Debris Avalanche and Flash Flood: Interactive 2D and 3D terrain reconstruction"
+type: software
+abstract: "Interactive 2D and 3D terrain reconstruction of the 2026 Nepal debris avalanche and flash flood, its river-system pathway, event timing and documented impacts."
+authors:
+  - family-names: Evelpidou
+    given-names: Niki
+    affiliation: "Department of Geology and Geoenvironment, National and Kapodistrian University of Athens"
+  - family-names: Liaskos
+    given-names: Alexandros
+    affiliation: "Department of Geology and Geoenvironment, National and Kapodistrian University of Athens"
+  - family-names: Spyrou
+    given-names: Evaggelos
+    affiliation: "Department of Geology and Geoenvironment, National and Kapodistrian University of Athens"
+  - family-names: Khadka
+    given-names: Nitesh
+    affiliation: "Centre for Water Resources Studies, Institute of Engineering, Tribhuvan University, Nepal"
+repository-code: "https://github.com/AlexandrosLiaskos/nepal-flood-2026"
+url: "https://evelpidou.nkua.cloud/Nepal-Flood-2026/"
+license: CC-BY-4.0
+keywords:
+  - Nepal
+  - debris avalanche
+  - flash flood
+  - terrain reconstruction
+  - WebGIS
