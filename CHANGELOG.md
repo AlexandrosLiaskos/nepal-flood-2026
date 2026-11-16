@@ -15,3 +15,8 @@ All notable changes to this repository are recorded in this file. The format fol
   with the syntax check of the modules.
 - The README, the licence, the citation file, the contributing guide, the code of conduct and this
   changelog.
+
+### Changed
+
+- The given name of Evangelos Spyrou is spelled "Evangelos" in the author lines of the page, in the
+  citation file and in the README, as on the team page of <https://evelpidou.nkua.cloud/>.

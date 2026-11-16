@@ -4,7 +4,7 @@ This repository holds the code of a web application that reconstructs the debris
 flood of 26 August 2026 in Nepal on the terrain, in two and three dimensions. The application shows the
 pathway of the flood along the river system, the timing of the event and the documented impacts.
 
-The application was made by Niki Evelpidou, Alexandros Liaskos and Evaggelos Spyrou (Department of
+The application was made by Niki Evelpidou, Alexandros Liaskos and Evangelos Spyrou (Department of
 Geology and Geoenvironment, National and Kapodistrian University of Athens) and Nitesh Khadka (Centre
 for Water Resources Studies, Institute of Engineering, Tribhuvan University, Nepal).
 
