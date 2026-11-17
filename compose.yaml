@@ -42,6 +42,10 @@ services:
       retries: 5
       start_period: 10s
     restart: unless-stopped
+    # server.py runs as PID 1 without a SIGTERM handler, so it ignores the
+    # default stop signal and is killed after 10 seconds. It stops at once on
+    # SIGINT.
+    stop_signal: SIGINT
 
 networks:
   nkua_proxy:

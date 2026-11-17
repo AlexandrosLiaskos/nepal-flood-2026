@@ -18,5 +18,7 @@ All notable changes to this repository are recorded in this file. The format fol
 
 ### Changed
 
+- `compose.yaml` stops the container with SIGINT. `server.py` runs as PID 1 without a SIGTERM handler,
+  so it ignored the default stop signal and was killed after 10 seconds.
 - The given name of Evangelos Spyrou is spelled "Evangelos" in the author lines of the page, in the
   citation file and in the README, as on the team page of <https://evelpidou.nkua.cloud/>.
